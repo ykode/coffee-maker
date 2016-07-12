@@ -28,6 +28,16 @@ public class Main {
     return acc;
   }
 
+  public static <T> List<T> filter (final List <T> in, final Func<T, Boolean> pred) {
+    final List<T> filtered = new ArrayList<T>(in.size());
+    for (T item : in) {
+      if (pred.apply(item)) {
+        filtered.add(item);
+      }
+    }
+    return filtered;
+  }
+
   public static void main(String[] args) {
     final CoffeeCup c = new CoffeeCup.Builder(2)
         .milk(1)
@@ -45,7 +55,10 @@ public class Main {
 
     System.out.println(cBlack);
 
-    final List<CoffeeCup> cups = Arrays.asList(new CoffeeCup.Builder(1).build(), new CoffeeCup.Builder(2).build());
+    final List<CoffeeCup> cups = Arrays.asList(new CoffeeCup.Builder(1).build(),
+                                               new CoffeeCup.Builder(2).build(),
+                                               new CoffeeCup.Builder(3).build());
+
     final List<CoffeeCup> sweetCups = new ArrayList<>(cups.size());
 
     for (final CoffeeCup cup : cups ) {
@@ -92,6 +105,7 @@ public class Main {
 
     execute(map(cups, addWhipFunc), printAction);
     execute(map(tooSweetCups, addWhipFunc), printAction);
+    execute(map(cups, x -> x.newBuilder().whipCream(true).sugar(1.5f).build()), System.out::println);
 
     final Func2<Float, CoffeeCup, Float> calorieTotalF = new Func2<Float, CoffeeCup, Float>() {
       static final int calPerSpoon = 16;
@@ -103,5 +117,7 @@ public class Main {
 
     System.out.println("Total calorie for sweet cup: " + reduce(sweetCups, calorieTotalF, 0.0f));
     System.out.println("Total calorie for too sweet cup: " + reduce(tooSweetCups, calorieTotalF, 0.0f));
+
+    execute(filter(cups, x -> x.beanShot >=2), System.out::println);
   }
 }
